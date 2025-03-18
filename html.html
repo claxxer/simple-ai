@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple AI Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        #chatbox { width: 100%; max-width: 400px; height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin: auto; }
+        input, button { margin-top: 10px; padding: 10px; width: 80%; }
+    </style>
+</head>
+<body>
+    <h2>Simple AI Chatbot</h2>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        async function sendMessage() {
+            let userInput = document.getElementById("userInput").value;
+            if (!userInput) return;
+            
+            let chatbox = document.getElementById("chatbox");
+            chatbox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+            document.getElementById("userInput").value = "";
+            
+            let response = await fetch("https://api.openai.com/v1/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer YOUR_OPENAI_API_KEY"
+                },
+                body: JSON.stringify({
+                    model: "text-davinci-003",
+                    prompt: userInput,
+                    max_tokens: 50
+                })
+            });
+            let data = await response.json();
+            let botReply = data.choices[0].text.trim();
+            
+            chatbox.innerHTML += `<p><strong>Bot:</strong> ${botReply}</p>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
